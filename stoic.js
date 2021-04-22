@@ -19,10 +19,10 @@ const MyInfinixPhone = {
         platformVersion: "9",
         deviceName: "Infinix S5",
         noReset: 'true',
-        // app: "Chrome",
-        appPackage: "com.whatsapp",
-        appActivity: "com.whatsapp.HomeActivity",
-        automationName: "UiAutomator2"
+        app: "/home/olami/Documents/base.apk",
+        appPackage: "com.cindicator.stoic_android",
+        appActivity: "com.cindicator.stoic_android.view.SplashScreen",
+        automationName: "UiAutomator2",
     }
 };
 
@@ -48,11 +48,10 @@ async function start(opts, folder) {
 
     let path_to_phone = path.join(__dirname, folder, 'phones.txt')
     let path_sender_txt = path.join(__dirname, folder, 'sender.txt')
-    let path_dont_send_txt = path.join(__dirname, folder, 'dont_send.txt')
+    let path_dont_send_txt = path.join(__dirname, folder, 'dont_send.txt');
 
     if(!fs.existsSync(msg_path)) {
-        console.log('yes!!!')
-        msg_path = path.join(__dirname, 'msg.txt')
+        msg_path = path.join(__dirname, 'msg.txt');
     }
 
     if(!fs.existsSync(path_to_phone)) {
@@ -75,25 +74,28 @@ async function start(opts, folder) {
     let msg = fs.readFileSync(msg_path, 'utf8')
 
 
-    let lineReader = fs.readFileSync(path_to_phone, 'utf8').toString().split('\n').filter(Boolean)
+    let lineReader = fs.readFileSync(path_to_phone, 'utf8').toString().split('\n').filter(Boolean);
 
     for (let line of lineReader) {
 
         try {
-            client.url(`https://wa.me/${line.replace('+', '')}`)
 
-            const field = await client.$("android.widget.EditText");
-            await field.setValue(`${msg.toString()}`)
-
-            client.keys(['Tab'])
+            client.keys(['Tab']);
+            await client.keys(['Enter']);
+            let emailField = await client.$("android.widget.EditText");
+            await emailField.setValue(`${msg.toString()}`);
+            client.keys(['Tab']);
+            client.keys(['Tab']);
+            client.keys(['Tab']);
+            await client.keys(['Enter']);
+            let amountField = await client.$("android.widget.EditText");
+            await amountField.setValue(`1000`);
             client.keys(['Tab'])
             await client.keys(['Enter']).finally(() => {
                 // console.log('Reached here...')
 
                 //  append to find
-
-                console.log('appending ' + line.replace('+', '') + ' to sender')
-                fs.appendFileSync(path_sender_txt, line.replace('+', '') + '\n')
+                console.log('Clicking submitting')
                 sleep(pause_secs)
             })
         } catch (Error) {
